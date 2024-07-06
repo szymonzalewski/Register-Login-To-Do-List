@@ -1,11 +1,7 @@
 {
   "hosting": {
-    "public": "/Users/szymonzalewski/react_js_nauka_16_ToDoList",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
