@@ -1,81 +1,53 @@
-import { useState, useEffect } from "react";
-import { db } from "./firebaseConfig";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import React, { useState } from "react";
+import useToDoList from "./useToDoList";
 
 function ToDoList() {
-  const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
-
-  // Pobieranie danych z Firestore
-  useEffect(() => {
-    const fetchTasks = async () => {
-      const querySnapshot = await getDocs(collection(db, "tasks"));
-      setTasks(
-        querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-      );
-    };
-
-    fetchTasks();
-  }, []);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingTaskName, setEditingTaskName] = useState("");
+  const {
+    tasks,
+    addTask,
+    deleteTask,
+    updateTask,
+    moveTaskUp,
+    moveTaskDown,
+    loading,
+    error,
+  } = useToDoList();
 
   function handleInputChange(event) {
     setNewTask(event.target.value);
   }
 
-  async function addTask() {
-    if (newTask.trim() !== "") {
-      const docRef = await addDoc(collection(db, "tasks"), { name: newTask });
-      setTasks((t) => [...t, { id: docRef.id, name: newTask }]);
-      setNewTask("");
+  async function handleAddTask() {
+    await addTask(newTask);
+    setNewTask("");
+  }
+
+  function handleEditTaskChange(event) {
+    setEditingTaskName(event.target.value);
+  }
+
+  async function handleUpdateTask() {
+    if (editingTaskId) {
+      await updateTask(editingTaskId, editingTaskName);
+      setEditingTaskId(null);
+      setEditingTaskName("");
     }
   }
 
-  async function deleteTask(id) {
-    await deleteDoc(doc(db, "tasks", id));
-    setTasks(tasks.filter((task) => task.id !== id));
+  function startEditingTask(id, name) {
+    setEditingTaskId(id);
+    setEditingTaskName(name);
   }
 
-  async function updateTask(id, updatedTask) {
-    await updateDoc(doc(db, "tasks", id), { name: updatedTask });
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, name: updatedTask } : task,
-      ),
-    );
-  }
-
-  function moveTaskUp(index) {
-    if (index > 0) {
-      const updatedTasks = [...tasks];
-      [updatedTasks[index], updatedTasks[index - 1]] = [
-        updatedTasks[index - 1],
-        updatedTasks[index],
-      ];
-      setTasks(updatedTasks);
-    }
-  }
-
-  function moveTaskDown(index) {
-    if (index < tasks.length - 1) {
-      const updatedTasks = [...tasks];
-      [updatedTasks[index], updatedTasks[index + 1]] = [
-        updatedTasks[index + 1],
-        updatedTasks[index],
-      ];
-      setTasks(updatedTasks);
-    }
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="to-do-list">
-      <h1>To-Do-List</h1>
+      <h1>To-Do List</h1>
       <div>
         <input
           type="text"
@@ -83,29 +55,62 @@ function ToDoList() {
           value={newTask}
           onChange={handleInputChange}
         />
-        <button className="add-button" onClick={addTask}>
+        <button className="add-button" onClick={handleAddTask}>
           Add
         </button>
       </div>
       <ol>
         {tasks.map((task, index) => (
           <li key={task.id}>
-            <span className="text">{task.name}</span>
-            <button
-              className="delete-button"
-              onClick={() => deleteTask(task.id)}>
-              Delete
-            </button>
-            <button className="move-button" onClick={() => moveTaskUp(index)}>
-              👆
-            </button>
-            <button className="move-button" onClick={() => moveTaskDown(index)}>
-              👇
-            </button>
+            {editingTaskId === task.id ? (
+              <>
+                <input
+                  type="text"
+                  value={editingTaskName}
+                  onChange={handleEditTaskChange}
+                />
+                <button className="update-button" onClick={handleUpdateTask}>
+                  Update
+                </button>
+                <button
+                  className="cancel-button"
+                  onClick={() => {
+                    setEditingTaskId(null);
+                    setEditingTaskName("");
+                  }}>
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="text">{task.name}</span>
+                <button
+                  className="edit-button"
+                  onClick={() => startEditingTask(task.id, task.name)}>
+                  Edit
+                </button>
+                <button
+                  className="delete-button"
+                  onClick={() => deleteTask(task.id)}>
+                  Delete
+                </button>
+                <button
+                  className="move-button"
+                  onClick={() => moveTaskUp(index)}>
+                  👆
+                </button>
+                <button
+                  className="move-button"
+                  onClick={() => moveTaskDown(index)}>
+                  👇
+                </button>
+              </>
+            )}
           </li>
         ))}
       </ol>
     </div>
   );
 }
+
 export default ToDoList;

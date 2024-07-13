@@ -34,6 +34,9 @@ button {
 .move-button:hover {
   background-color: hsl(207, 90%, 54%);
 }
+.edit-button {
+  background-color: hsl(30, 86%, 50%);
+}
 input[type="text"] {
   font-size: 1.6rem;
   padding: 10px;
