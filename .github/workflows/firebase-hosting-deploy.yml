@@ -3,7 +3,11 @@ name: Deploy to Firebase Hosting
 on:
   push:
     branches:
+<<<<<<< HEAD
       - main # Zmień na gałąź, której używasz
+=======
+      - main  # Zmień na gałąź, którą używasz
+>>>>>>> 70aed1d8ac10a0870114cb11876aa7462640f62c
 
 jobs:
   build_and_deploy:
@@ -16,7 +20,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
+<<<<<<< HEAD
           node-version: "14"
+=======
+          node-version: '14'
+>>>>>>> 70aed1d8ac10a0870114cb11876aa7462640f62c
 
       - name: Install dependencies
         run: npm install
@@ -27,7 +35,14 @@ jobs:
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
+<<<<<<< HEAD
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: "to-do-list-756bf"
+=======
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: to-do-list-756bf
+>>>>>>> 70aed1d8ac10a0870114cb11876aa7462640f62c
