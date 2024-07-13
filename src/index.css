@@ -61,7 +61,7 @@ li {
 .text {
   flex: 1;
 }
-.delete-button,
+.edit-button .delete-button,
 .move-button {
   padding: 8px 12px;
   font-size: 1.4rem;
